@@ -1,0 +1,191 @@
+/* Screen UI foundation. Palettes and appearance preferences stay in
+ * globals.css; these roles resolve from them. Paper uses its own typography. */
+:root {
+  --space-4: 0.25rem;
+  --space-8: 0.5rem;
+  --space-12: 0.75rem;
+  --space-16: 1rem;
+  --space-20: 1.25rem;
+  --space-24: 1.5rem;
+  --space-32: 2rem;
+  --radius-4: 0.25rem;
+  --radius-6: 0.375rem;
+  --radius-8: 0.5rem;
+  --radius-12: 0.75rem;
+
+  --type-caption-size: 0.6875rem;
+  --type-caption-line: 1rem;
+  --type-metadata-size: 0.75rem;
+  --type-metadata-line: 1rem;
+  --type-body-size: 0.875rem;
+  --type-body-line: 1.25rem;
+  --type-label-size: 0.8125rem;
+  --type-label-line: 1.25rem;
+  --type-section-size: 0.875rem;
+  --type-section-line: 1.25rem;
+  --type-page-size: 1.25rem;
+  --type-page-line: 1.75rem;
+  --weight-body: 400;
+  --weight-label: 500;
+  --weight-heading: 600;
+  --tracking-heading: -0.02em;
+  --numeric-variant: tabular-nums;
+
+  color-scheme: light;
+  --surface-background: var(--material-work);
+  --surface: var(--material-panel);
+  --surface-secondary: var(--color-neutral-100);
+  --surface-hover: var(--color-neutral-100);
+  --surface-selected: var(--color-neutral-200);
+  --surface-elevated: var(--material-overlay);
+  --surface-control: var(--material-control);
+  --border-subtle: var(--material-line);
+  --border-default: var(--color-neutral-300);
+  --border-strong: var(--color-neutral-400);
+  --text-primary: var(--foreground);
+  --text-secondary: var(--color-neutral-600);
+  --text-muted: var(--color-neutral-500);
+  --text-disabled: var(--text-muted);
+  --action-background: var(--color-clay-700);
+  --action-hover: var(--color-clay-800);
+  --action-active: var(--color-clay-900);
+  --action-ink: #fff;
+  --focus-color: var(--color-clay-700);
+  --focus-width: 2px;
+  --focus-offset: 2px;
+  --success-ink: var(--color-emerald-800);
+  --success-surface: var(--color-emerald-50);
+  --success-line: var(--color-emerald-600);
+  --danger-ink: var(--color-red-800);
+  --danger-surface: var(--color-red-50);
+  --danger-hover: var(--color-red-100);
+  --danger-line: var(--color-red-600);
+
+  --sidebar-width: 14rem;
+  --sidebar-collapsed-width: 4.5rem;
+  --toolbar-height: 3rem;
+  --workspace-gutter: var(--space-32);
+  --control-height: 2rem;
+  --control-touch-height: 2.75rem;
+  /* Existing FormLayout geometry, shared by compact working forms. */
+  --field-width-short: 10rem;
+  --field-width: 16rem;
+  --field-width-wide: 20rem;
+  --form-column-min: 11rem;
+  --icon-size: 1rem;
+  --duration-fast: 120ms;
+  --shadow-popover: 0 4px 16px #0002;
+  --shadow-overlay: 0 8px 24px #0003;
+}
+
+:root[data-mode="dark"] {
+  color-scheme: dark;
+  --surface-secondary: var(--color-neutral-800);
+  --surface-hover: var(--color-neutral-800);
+  --surface-selected: var(--color-neutral-700);
+  --border-default: var(--color-neutral-600);
+  --border-strong: var(--color-neutral-500);
+  --text-secondary: var(--color-neutral-300);
+  --text-muted: color-mix(in srgb, var(--color-neutral-400) 25%, var(--color-neutral-300));
+  --text-disabled: var(--text-muted);
+  --action-background: var(--color-clay-300);
+  --action-hover: var(--color-clay-200);
+  --action-active: var(--color-clay-100);
+  --action-ink: var(--color-neutral-950);
+  --focus-color: var(--color-clay-300);
+  --success-ink: var(--color-emerald-300);
+  --success-surface: var(--color-emerald-950);
+  --success-line: var(--color-emerald-500);
+  --danger-ink: var(--color-red-300);
+  --danger-surface: var(--color-red-950);
+  --danger-hover: var(--color-red-900);
+  --danger-line: var(--color-red-400);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-mode="system"] {
+    color-scheme: dark;
+    --surface-secondary: var(--color-neutral-800);
+    --surface-hover: var(--color-neutral-800);
+    --surface-selected: var(--color-neutral-700);
+    --border-default: var(--color-neutral-600);
+    --border-strong: var(--color-neutral-500);
+    --text-secondary: var(--color-neutral-300);
+    --text-muted: color-mix(in srgb, var(--color-neutral-400) 25%, var(--color-neutral-300));
+    --text-disabled: var(--text-muted);
+    --action-background: var(--color-clay-300);
+    --action-hover: var(--color-clay-200);
+    --action-active: var(--color-clay-100);
+    --action-ink: var(--color-neutral-950);
+    --focus-color: var(--color-clay-300);
+    --success-ink: var(--color-emerald-300);
+  --success-surface: var(--color-emerald-950);
+  --success-line: var(--color-emerald-500);
+  --danger-ink: var(--color-red-300);
+    --danger-surface: var(--color-red-950);
+    --danger-hover: var(--color-red-900);
+    --danger-line: var(--color-red-400);
+  }
+}
+
+/* Inline aliases keep utilities responsive to appearance. New components use
+ * semantic roles; legacy palette utilities migrate during each module phase. */
+@theme inline {
+  --spacing-1: var(--space-4);
+  --spacing-2: var(--space-8);
+  --spacing-3: var(--space-12);
+  --spacing-4: var(--space-16);
+  --spacing-5: var(--space-20);
+  --spacing-6: var(--space-24);
+  --spacing-8: var(--space-32);
+  --spacing-control: var(--control-height);
+  --spacing-control-touch: var(--control-touch-height);
+  --spacing-field-short: var(--field-width-short);
+  --spacing-field: var(--field-width);
+  --spacing-field-wide: var(--field-width-wide);
+  --radius-control: var(--radius-6);
+  --radius-panel: var(--radius-8);
+  --radius-overlay: var(--radius-12);
+  --color-background: var(--surface-background);
+  --color-surface: var(--surface);
+  --color-surface-secondary: var(--surface-secondary);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-selected: var(--surface-selected);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-control: var(--surface-control);
+  --color-line-subtle: var(--border-subtle);
+  --color-line: var(--border-default);
+  --color-line-strong: var(--border-strong);
+  --color-ink: var(--text-primary);
+  --color-ink-secondary: var(--text-secondary);
+  --color-ink-muted: var(--text-muted);
+  --color-ink-disabled: var(--text-disabled);
+  --color-action: var(--action-background);
+  --color-action-hover: var(--action-hover);
+  --color-action-active: var(--action-active);
+  --color-action-ink: var(--action-ink);
+  --color-focus: var(--focus-color);
+  --color-danger-ink: var(--danger-ink);
+  --color-danger-surface: var(--danger-surface);
+  --color-danger-hover: var(--danger-hover);
+  --color-success-ink: var(--success-ink);
+  --color-success-surface: var(--success-surface);
+  --color-success-line: var(--success-line);
+  --color-danger-line: var(--danger-line);
+  --font-weight-normal: var(--weight-body);
+  --font-weight-medium: var(--weight-label);
+  --font-weight-semibold: var(--weight-heading);
+  --default-transition-duration: var(--duration-fast);
+  --text-caption: var(--type-caption-size);
+  --text-caption--line-height: var(--type-caption-line);
+  --text-metadata: var(--type-metadata-size);
+  --text-metadata--line-height: var(--type-metadata-line);
+  --text-body: var(--type-body-size);
+  --text-body--line-height: var(--type-body-line);
+  --text-label: var(--type-label-size);
+  --text-label--line-height: var(--type-label-line);
+  --text-section-title: var(--type-section-size);
+  --text-section-title--line-height: var(--type-section-line);
+  --text-page-title: var(--type-page-size);
+  --text-page-title--line-height: var(--type-page-line);
+}

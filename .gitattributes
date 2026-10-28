@@ -1,0 +1,16 @@
+* text=auto
+.env* export-ignore
+.env.example -export-ignore
+.nsp/ export-ignore
+.claude/ export-ignore
+.codex/ export-ignore
+.agents/ export-ignore
+.verification/ export-ignore
+node_modules/ export-ignore
+.next/ export-ignore
+output/ export-ignore
+attachments/ export-ignore
+
+# Preserve upstream third-party notice bytes in future source checkouts.
+NOTICES/** -text
+LICENSE -text

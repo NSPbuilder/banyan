@@ -1,0 +1,17 @@
+[
+  {
+    "family": "Inter",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/OFL.txt",
+    "sha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57"
+  },
+  {
+    "family": "Source Serif 4",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourceserif4/OFL.txt",
+    "sha256": "5f94c3fd3a23131a417ab5a0c8452de57e70c3cfb9f604d88241f7065ebf9fd9"
+  },
+  {
+    "family": "Geist Mono",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/geistmono/OFL.txt",
+    "sha256": "1781d2806a07d91c4edf4740b88449fab7d0eadad53f7c351b94cd4d4eb8c00f"
+  }
+]

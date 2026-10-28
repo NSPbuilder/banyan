@@ -1,0 +1,904 @@
+@import "tailwindcss";
+@import "./design-tokens.css";
+
+/* Drag feedback is shared by spreadsheet tables and grid-based line forms. */
+.line-drag-handle:not(:disabled) { cursor: grab; }
+.line-drag-handle:active:not(:disabled), .line-drag-handle[aria-pressed="true"] { cursor: grabbing; }
+.line-order-row[data-sort-dragging="true"] { opacity: 0.4; }
+.line-order-row[data-sort-before="true"] { box-shadow: 0 -2px 0 var(--focus-color); }
+.line-order-row[data-sort-after="true"] { box-shadow: 0 2px 0 var(--focus-color); }
+.line-drag-ghost { position: fixed; top: 0; left: 0; z-index: 100; pointer-events: none; overflow: hidden; background: var(--surface); border-radius: var(--radius-6); box-shadow: var(--shadow-popover); opacity: 0.96; }
+.line-drag-indicator { position: fixed; top: 0; left: 0; z-index: 101; height: 2px; pointer-events: none; background: var(--focus-color); }
+
+/*
+ * THE PALETTE IS REDEFINED, NOT REPLACED EVERYWHERE.
+ *
+ * The owner asked for warmth — 「整体色调最好能使用claude类似的米黄色」 — and
+ * this tree writes `neutral-300`, `neutral-500`, `neutral-900` in several
+ * hundred places. Editing those would be several hundred chances to leave one
+ * behind, so the SCALE ITSELF is warm: every `neutral-*` already written
+ * became cream and stone the moment this block existed, and every one written
+ * tomorrow will be too. Greys are not neutral here on purpose.
+ *
+ * The numbers remain ordinary Tailwind steps. Small text uses readable
+ * palette values in both modes; new components use semantic text roles.
+ */
+@theme {
+  --color-neutral-50:  #faf9f5;   /* the page itself */
+  --color-neutral-100: #f4f1e8;
+  --color-neutral-200: #e9e4d6;
+  --color-neutral-300: #d9d2c0;   /* every border in the application */
+  --color-neutral-400: #b3aa96;
+  --color-neutral-500: #6a6252;   /* the quiet second line under a heading */
+  --color-neutral-600: #665f4f;
+  --color-neutral-700: #4a453a;
+  --color-neutral-800: #322e27;
+  --color-neutral-900: #23201b;   /* dark surfaces, and text on cream */
+  --color-neutral-950: #16140f;
+
+  /*
+   * The one colour that is not a grey. A button on cream has to look pressable
+   * (owner: 「按钮能更明显」), and near-black on cream reads as text.
+   */
+  --color-clay-50:  #fdf3ef;
+  --color-clay-100: #fae3da;
+  --color-clay-200: #f3c4b3;
+  --color-clay-300: #e9a086;
+  --color-clay-400: #de7f5f;
+  --color-clay-500: #d97757;
+  --color-clay-600: #c05f3d;
+  --color-clay-700: #9c4a2e;
+  --color-clay-800: #7a3b26;
+  --color-clay-900: #5f3020;
+
+  /* Screen UI uses sans; serif remains available to paper layouts. */
+  --font-sans: var(--font-ui), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-display), ui-serif, Georgia, serif;
+  --font-mono: var(--font-figures), ui-monospace, SFMono-Regular, monospace;
+}
+
+/*
+ * A SECOND PALETTE, and the switch is one attribute.
+ *
+ * The utilities Tailwind compiled all read `var(--color-…)`, so redefining
+ * those variables under `[data-theme]` re-colours every screen at once —
+ * the same reason the warm scale above did not need five hundred edits. A
+ * further palette is a block like this one, an entry in `appearance.ts`, and
+ * a new migration extending the theme CHECK.
+ *
+ * FIG: the tree the application is named after. The greys carry a leaf cast
+ * rather than a clay one, and the accent is the leaf itself. The steps are
+ * the same steps, so contrast behaves the way every class already assumes.
+ */
+:root[data-theme="figtree"] {
+  --color-neutral-50:  #f6f8f2;
+  --color-neutral-100: #eef2e7;
+  --color-neutral-200: #dfe6d5;
+  --color-neutral-300: #c8d3ba;
+  --color-neutral-400: #9aab89;
+  --color-neutral-500: #58684c;
+  --color-neutral-600: #55654a;
+  --color-neutral-700: #3e4b36;
+  --color-neutral-800: #2a3325;
+  --color-neutral-900: #1d2419;
+  --color-neutral-950: #121710;
+
+  --color-clay-50:  #eff5ec;
+  --color-clay-100: #dbe9d4;
+  --color-clay-200: #b8d3ac;
+  --color-clay-300: #90b880;
+  --color-clay-400: #6a9a58;
+  --color-clay-500: #578a45;
+  --color-clay-600: #4a7c3f;
+  --color-clay-700: #3a6231;
+  --color-clay-800: #2e4d27;
+  --color-clay-900: #24391f;
+}
+
+/* Neutral paper, ink, and interaction colours. Both modes use the same scale. */
+:root[data-theme="monochrome"] {
+  accent-color: var(--action-background);
+  --color-neutral-50:  #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+  --color-neutral-950: #0a0a0a;
+
+  --color-clay-50:  #fafafa;
+  --color-clay-100: #f5f5f5;
+  --color-clay-200: #e5e5e5;
+  --color-clay-300: #d4d4d4;
+  --color-clay-400: #a3a3a3;
+  --color-clay-500: #737373;
+  --color-clay-600: #525252;
+  --color-clay-700: #262626;
+  --color-clay-800: #171717;
+  --color-clay-900: #0a0a0a;
+}
+
+/*
+ * LIQUID GLASS — depth without turning the books into decoration.
+ *
+ * The colour scale still does the ordinary work: text, rules, active states,
+ * and every existing Tailwind utility remain readable. The extra variables
+ * below describe MATERIAL rather than meaning. They are used only inside the
+ * screen media query further down, so a printed statement remains paper.
+ */
+:root[data-theme="liquid"] {
+  --color-neutral-50:  #edf5ff;
+  --color-neutral-100: #e1ecf8;
+  --color-neutral-200: #cbd9e7;
+  --color-neutral-300: #aebfd0;
+  --color-neutral-400: #8296aa;
+  --color-neutral-500: #485d72;
+  --color-neutral-600: #45596e;
+  --color-neutral-700: #334458;
+  --color-neutral-800: #223044;
+  --color-neutral-900: #172235;
+  --color-neutral-950: #0b1220;
+
+  --color-clay-50:  #eef8ff;
+  --color-clay-100: #d9efff;
+  --color-clay-200: #b6e1ff;
+  --color-clay-300: #7dccff;
+  --color-clay-400: #36b1f7;
+  --color-clay-500: #1193dc;
+  --color-clay-600: #0877bc;
+  --color-clay-700: #075f98;
+  --color-clay-800: #0b507c;
+  --color-clay-900: #0c4367;
+
+  --material-tool: var(--liquid-nav);
+  --material-work: #f7faff;
+  --material-panel: #fff;
+  --material-overlay: #fafdff;
+  --material-control: #fff;
+  --material-line: #d8e3ee;
+
+  --liquid-page: color-mix(in srgb, var(--liquid-tint) 12%, #f3f7fc);
+  --liquid-canvas:
+    radial-gradient(circle at 14% 8%, color-mix(in srgb, var(--liquid-tint) 54%, transparent), transparent 34rem),
+    radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--liquid-tint) 34%, transparent), transparent 30rem),
+    radial-gradient(circle at 70% 88%, color-mix(in srgb, var(--liquid-tint) 24%, transparent), transparent 28rem),
+    linear-gradient(135deg, #f8faff 0%, color-mix(in srgb, var(--liquid-tint) 17%, #f6f8fc) 52%, #faf9ff 100%);
+  --liquid-surface: rgba(255, 255, 255, 0.56);
+  --liquid-surface-subtle: rgba(255, 255, 255, 0.30);
+  --liquid-surface-strong: rgba(255, 255, 255, 0.76);
+  --liquid-control: rgba(255, 255, 255, 0.66);
+  --liquid-line: rgba(255, 255, 255, 0.72);
+  --liquid-control-line: rgba(113, 143, 173, 0.48);
+  --liquid-highlight: rgba(255, 255, 255, 0.76);
+  --liquid-shadow: rgba(51, 80, 120, 0.15);
+  --liquid-nav: rgba(8, 28, 54, 0.72);
+  --liquid-nav-flyout: rgba(7, 24, 47, 0.86);
+  --liquid-nav-text: #e5f0fa;
+  --liquid-nav-text-strong: #ffffff;
+  --liquid-search-bg: rgba(255, 255, 255, 0.88);
+  --liquid-search-text: #172235;
+  --liquid-search-placeholder: #45596e;
+  --liquid-nav-sheen:
+    radial-gradient(circle at 18% 0%, rgba(119, 202, 255, 0.30), transparent 18rem),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.035) 38%, transparent 72%);
+}
+
+/*
+ * LIGHT, DARK, OR WHAT THE MACHINE SAYS.
+ *
+ * `data-mode` is stamped on `<html>` by the shell from what the signed-in
+ * person chose, so there is no moment where the page is one and then the
+ * other. `system` is the only one that asks the machine.
+ */
+:root {
+  --background: var(--color-neutral-50);
+  --foreground: var(--color-neutral-900);
+  --material-tool: var(--color-neutral-100);
+  --tool-ink: var(--color-neutral-900);
+  --tool-muted: var(--color-neutral-600);
+  --tool-hover: color-mix(in srgb, var(--color-neutral-200) 60%, transparent);
+  --tool-selected: var(--color-neutral-200);
+  --material-work: var(--color-neutral-50);
+  --material-panel: #fff;
+  --material-overlay: #fff;
+  --material-control: #fff;
+  --material-line: var(--color-neutral-200);
+}
+
+:root[data-mode="dark"] {
+  --color-neutral-500: color-mix(in srgb, var(--color-neutral-400) 25%, var(--color-neutral-300));
+  --material-tool: var(--color-neutral-900);
+  --tool-ink: var(--color-neutral-100);
+  --tool-muted: var(--color-neutral-400);
+  --tool-hover: color-mix(in srgb, var(--color-neutral-700) 45%, transparent);
+  --tool-selected: var(--color-neutral-700);
+  --background: var(--color-neutral-950);
+  --foreground: var(--color-neutral-100);
+  --material-work: var(--color-neutral-950);
+  --material-panel: var(--color-neutral-900);
+  --material-overlay: var(--color-neutral-900);
+  --material-control: var(--color-neutral-900);
+  --material-line: var(--color-neutral-700);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-mode="system"] {
+    --color-neutral-500: color-mix(in srgb, var(--color-neutral-400) 25%, var(--color-neutral-300));
+    --material-tool: var(--color-neutral-900);
+    --tool-ink: var(--color-neutral-100);
+    --tool-muted: var(--color-neutral-400);
+    --tool-hover: color-mix(in srgb, var(--color-neutral-700) 45%, transparent);
+    --tool-selected: var(--color-neutral-700);
+    --background: var(--color-neutral-950);
+    --foreground: var(--color-neutral-100);
+    --material-work: var(--color-neutral-950);
+    --material-panel: var(--color-neutral-900);
+    --material-overlay: var(--color-neutral-900);
+    --material-control: var(--color-neutral-900);
+    --material-line: var(--color-neutral-700);
+  }
+}
+
+:root[data-theme="liquid"][data-mode="dark"] {
+  --material-work: #101a2b;
+  --material-panel: #182439;
+  --material-overlay: #182439;
+  --material-control: #182439;
+  --material-line: #33465e;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="liquid"][data-mode="system"] {
+    --material-work: #101a2b;
+    --material-panel: #182439;
+    --material-overlay: #182439;
+    --material-control: #182439;
+    --material-line: #33465e;
+  }
+}
+
+/* Tool material takes precedence over mode defaults; reduced-transparency
+   still replaces --liquid-nav with its opaque fallback. */
+:root[data-theme="liquid"][data-mode] {
+  --material-tool: var(--liquid-nav);
+  --tool-ink: var(--liquid-nav-text-strong);
+  --tool-muted: var(--liquid-nav-text);
+  --tool-hover: rgba(255, 255, 255, .08);
+  --tool-selected: rgba(255, 255, 255, .14);
+}
+
+/* Liquid Glass has one palette and still honours the same three mode choices. */
+:root[data-theme="liquid"][data-mode="dark"] {
+  /* Many screen subtitles deliberately use one neutral token in both modes;
+     lift that token here so small text remains comfortably legible on glass. */
+  --color-neutral-500: color-mix(in srgb, var(--color-neutral-400) 25%, var(--color-neutral-300));
+  --liquid-page: color-mix(in srgb, var(--liquid-tint) 10%, #090f1c);
+  --liquid-canvas:
+    radial-gradient(circle at 13% 5%, color-mix(in srgb, var(--liquid-tint) 35%, transparent), transparent 35rem),
+    radial-gradient(circle at 90% 14%, color-mix(in srgb, var(--liquid-tint) 26%, transparent), transparent 30rem),
+    radial-gradient(circle at 68% 90%, color-mix(in srgb, var(--liquid-tint) 18%, transparent), transparent 28rem),
+    linear-gradient(135deg, #0b1220 0%, color-mix(in srgb, var(--liquid-tint) 10%, #10192a) 52%, #151225 100%);
+  --liquid-surface: rgba(20, 31, 50, 0.60);
+  --liquid-surface-subtle: rgba(20, 31, 50, 0.38);
+  --liquid-surface-strong: rgba(24, 37, 59, 0.78);
+  --liquid-control: rgba(18, 30, 49, 0.72);
+  --liquid-line: rgba(192, 222, 255, 0.16);
+  --liquid-control-line: rgba(145, 183, 219, 0.28);
+  --liquid-highlight: rgba(226, 241, 255, 0.13);
+  --liquid-shadow: rgba(0, 0, 0, 0.34);
+  --liquid-nav: rgba(3, 11, 24, 0.66);
+  --liquid-nav-flyout: rgba(3, 12, 27, 0.90);
+  --liquid-search-bg: rgba(18, 30, 49, 0.90);
+  --liquid-search-text: #f7faff;
+  --liquid-search-placeholder: #d4e4f4;
+  --liquid-nav-sheen:
+    radial-gradient(circle at 18% 0%, rgba(55, 151, 221, 0.24), transparent 18rem),
+    linear-gradient(145deg, rgba(226, 241, 255, 0.13), rgba(226, 241, 255, 0.025) 38%, transparent 72%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="liquid"][data-mode="system"] {
+    --color-neutral-500: color-mix(in srgb, var(--color-neutral-400) 25%, var(--color-neutral-300));
+    --liquid-page: color-mix(in srgb, var(--liquid-tint) 10%, #090f1c);
+    --liquid-canvas:
+      radial-gradient(circle at 13% 5%, color-mix(in srgb, var(--liquid-tint) 35%, transparent), transparent 35rem),
+      radial-gradient(circle at 90% 14%, color-mix(in srgb, var(--liquid-tint) 26%, transparent), transparent 30rem),
+      radial-gradient(circle at 68% 90%, color-mix(in srgb, var(--liquid-tint) 18%, transparent), transparent 28rem),
+      linear-gradient(135deg, #0b1220 0%, color-mix(in srgb, var(--liquid-tint) 10%, #10192a) 52%, #151225 100%);
+    --liquid-surface: rgba(20, 31, 50, 0.60);
+    --liquid-surface-subtle: rgba(20, 31, 50, 0.38);
+    --liquid-surface-strong: rgba(24, 37, 59, 0.78);
+    --liquid-control: rgba(18, 30, 49, 0.72);
+    --liquid-line: rgba(192, 222, 255, 0.16);
+    --liquid-control-line: rgba(145, 183, 219, 0.28);
+    --liquid-highlight: rgba(226, 241, 255, 0.13);
+    --liquid-shadow: rgba(0, 0, 0, 0.34);
+    --liquid-nav: rgba(3, 11, 24, 0.66);
+    --liquid-nav-flyout: rgba(3, 12, 27, 0.90);
+    --liquid-search-bg: rgba(18, 30, 49, 0.90);
+    --liquid-search-text: #f7faff;
+    --liquid-search-placeholder: #d4e4f4;
+    --liquid-nav-sheen:
+      radial-gradient(circle at 18% 0%, rgba(55, 151, 221, 0.24), transparent 18rem),
+      linear-gradient(145deg, rgba(226, 241, 255, 0.13), rgba(226, 241, 255, 0.025) 38%, transparent 72%);
+  }
+}
+
+/*
+ * …and the `dark:` utilities the whole tree is written in follow the same
+ * answer. Without this they would go on asking the machine, and choosing
+ * "Dark" would darken the page and nothing on it.
+ */
+@custom-variant dark {
+  &:where([data-mode="dark"], [data-mode="dark"] *) { @slot; }
+  @media (prefers-color-scheme: dark) {
+    &:where([data-mode="system"], [data-mode="system"] *) { @slot; }
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  /* Figures that line up in a column without being told to, everywhere. This
+     is a book of numbers. */
+  font-variant-numeric: var(--numeric-variant);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line);
+}
+
+h1, h2 { font-family: var(--font-sans); letter-spacing: var(--tracking-heading); }
+
+/*
+ * Material has three roles: tool chrome, stable work surfaces, and floating
+ * panels. A card or input is not glass just because it uses `bg-white`.
+ */
+@media screen {
+
+  :root[data-theme="liquid"] body {
+    background-color: var(--liquid-page);
+    background-image: var(--liquid-canvas);
+    background-attachment: fixed;
+    background-size: cover;
+  }
+
+  :root[data-theme="liquid"] .ui-card,
+  :root[data-theme="liquid"] .ledger-canvas table {
+    background-color: var(--material-panel);
+    border-color: var(--material-line);
+  }
+
+  :root[data-theme="liquid"] :where(input[type="radio"], input[type="checkbox"]) {
+    accent-color: var(--color-clay-600);
+  }
+
+  :root[data-theme="liquid"] .nav-rail {
+    background-color: var(--material-tool);
+    color: var(--liquid-nav-text);
+    border-right-color: var(--liquid-line);
+    -webkit-backdrop-filter: blur(20px) saturate(130%);
+    backdrop-filter: blur(20px) saturate(130%);
+  }
+
+  :root[data-theme="liquid"] .nav-flyout {
+    background-color: var(--liquid-nav-flyout);
+    color: var(--liquid-nav-text);
+    border-color: transparent;
+    box-shadow: 0 8px 24px var(--liquid-shadow);
+    -webkit-backdrop-filter: blur(20px) saturate(130%);
+    backdrop-filter: blur(20px) saturate(130%);
+  }
+
+  :root[data-theme="liquid"] .nav-rail :where([class~="text-neutral-300"], [class~="text-neutral-400"], [class~="text-neutral-600"]) {
+    color: var(--liquid-nav-text);
+  }
+
+  :root[data-theme="liquid"] .nav-rail :where(a, button):hover {
+    color: var(--liquid-nav-text-strong);
+  }
+
+  :root[data-theme="liquid"] .nav-rail input[type="search"] {
+    background-color: var(--liquid-search-bg);
+    color: var(--liquid-search-text);
+  }
+
+  :root[data-theme="liquid"] .nav-rail input[type="search"]::placeholder {
+    color: var(--liquid-search-placeholder);
+    opacity: 1;
+  }
+
+  :root[data-theme="liquid"] .nav-flyout a:hover {
+    background-color: rgba(255, 255, 255, 0.10);
+  }
+}
+
+/* A system preference can remove the translucency without removing the theme. */
+@media screen and (prefers-reduced-transparency: reduce) {
+  :root[data-theme=liquid] {
+    --liquid-surface: #f7faff;
+    --liquid-surface-subtle: #eff5fd;
+    --liquid-surface-strong: #f7faff;
+    --liquid-control: #ffffff;
+    --liquid-nav: #0b1931;
+    --liquid-nav-flyout: #10243f;
+    --liquid-nav-sheen: none;
+  }
+  :root[data-theme="liquid"][data-mode="dark"] {
+    --liquid-surface: #141f32;
+    --liquid-surface-subtle: #111c2d;
+    --liquid-surface-strong: #18253b;
+    --liquid-control: #121e31;
+    --liquid-nav: #050c19;
+    --liquid-nav-flyout: #071120;
+    --liquid-nav-sheen: none;
+  }
+  :root[data-theme="liquid"] :where(.nav-rail, [class~="bg-white"], [class~="bg-white/90"], input, select, textarea) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media screen and (prefers-reduced-transparency: reduce) and (prefers-color-scheme: dark) {
+  :root[data-theme=liquid][data-mode="system"] {
+    --liquid-surface: #141f32;
+    --liquid-surface-subtle: #111c2d;
+    --liquid-surface-strong: #18253b;
+    --liquid-control: #121e31;
+    --liquid-nav: #050c19;
+    --liquid-nav-flyout: #071120;
+    --liquid-nav-sheen: none;
+  }
+}
+
+/* Old engines get the same hierarchy with solid surfaces instead of blur. */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  :root[data-theme=liquid] {
+    --liquid-surface: #f7faff;
+    --liquid-surface-subtle: #eff5fd;
+    --liquid-surface-strong: #f7faff;
+    --liquid-control: #ffffff;
+    --liquid-nav: #0b1931;
+    --liquid-nav-flyout: #10243f;
+    --liquid-nav-sheen: none;
+  }
+  :root[data-theme="liquid"][data-mode="dark"] {
+    --liquid-surface: #141f32;
+    --liquid-surface-subtle: #111c2d;
+    --liquid-surface-strong: #18253b;
+    --liquid-control: #121e31;
+    --liquid-nav: #050c19;
+    --liquid-nav-flyout: #071120;
+    --liquid-nav-sheen: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    :root[data-theme=liquid][data-mode="system"] {
+      --liquid-surface: #141f32;
+      --liquid-surface-subtle: #111c2d;
+      --liquid-surface-strong: #18253b;
+      --liquid-control: #121e31;
+      --liquid-nav: #050c19;
+      --liquid-nav-flyout: #071120;
+      --liquid-nav-sheen: none;
+    }
+  }
+}
+
+/*
+ * EVERY REQUIRED FIELD'S NAME IN BOLD (owner, 2026-09-07), as one rule
+ * rather than as a word added to two hundred labels — a label that says it is
+ * required and a field that is not, or the other way round, is the drift this
+ * avoids by construction: the browser reads it off the control itself.
+ *
+ * Three shapes, because the tree writes three: the field inside its label,
+ * the field next to it, and the field inside the box next to it.
+ *
+ * WHAT IT CANNOT SEE: a label separated from its field by anything else, and
+ * a field made required by JavaScript after the page loads. Nothing here does
+ * either, and no check watches this — there is no browser in the suites to
+ * read a computed style (RISKS §16).
+ */
+label:has(:required),
+:is(label, span):has(+ :required),
+:is(label, span):has(+ * :required) {
+  font-weight: var(--weight-heading);
+  color: var(--text-secondary);
+}
+/* …but not the control itself: Tailwind's reset makes inputs inherit it. */
+label:has(:required) :is(input, select, textarea, button) {
+  font-weight: var(--weight-body);
+}
+
+/*
+ * Every ordinary ledger page begins at the content pane's own 32px gutter.
+ * A page may keep a narrower max-width for readable forms, but that width is
+ * not a reason to centre the whole screen and move its title away from every
+ * other module. `data-centered-paper` is the explicit exception for a page
+ * whose on-screen layout is itself a print preview.
+ */
+@media screen {
+  [data-ledger-content] > .ledger-canvas-wrap > main:not([data-centered-paper]) {
+    margin-inline: 0;
+    padding-inline: var(--space-32);
+  }
+}
+
+/* The ERP layout borrows the reference's hierarchy and spacing. All colours
+   still come from FigTree's existing appearance tokens. */
+@media screen {
+  .desk-shell, .ledger-workspace { background: var(--material-tool); }
+  .desk-bar { height: 48px; flex: none; background: var(--material-tool); border-bottom: 1px solid var(--material-line); }
+  .desk-brand { color: var(--tool-ink); min-width: calc(var(--sidebar-width) - var(--space-20)); font-size: 15px; font-weight: 750; letter-spacing: -0.04em; }
+  .desk-tab-list { scrollbar-width: thin; scrollbar-color: var(--color-neutral-600) transparent; }
+  .desk-tab { border-radius: var(--radius-6) var(--radius-6) 0 0; transition: background-color .16s, color .16s; }
+  .desk-tab-active { background: var(--material-work); color: var(--foreground); font-weight: 650; box-shadow: inset 0 2px var(--color-clay-600); }
+  .desk-tab-inactive { background: var(--tool-hover); color: var(--tool-muted); }
+  .desk-tab-inactive:hover { background: var(--tool-selected); color: var(--tool-ink); }
+  .desk-tab-close { display: grid; place-items: center; width: 24px; height: 24px; color: inherit; opacity: .7; }
+  .desk-tab-close:hover { background: var(--tool-hover); color: inherit; opacity: 1; }
+  .desk-new-tab { color: var(--tool-muted); font-size: 20px; line-height: 1.35; }
+  .desk-new-tab:hover { color: var(--tool-ink); background: var(--tool-hover); }
+
+  .nav-rail { display: flex; flex-direction: column; position: sticky; top: 0; align-self: flex-start; min-height: 100vh; width: var(--sidebar-width); background: var(--material-tool); color: var(--tool-muted); border-right: 1px solid var(--border-subtle); }
+  .nav-company-link { min-height: var(--control-height); color: var(--tool-ink); }
+  .nav-company-name { color: var(--tool-ink); }
+  .nav-company-link:hover { background: var(--tool-selected); }
+  .nav-company { display: flex; align-items: center; gap: var(--space-4); }
+  .nav-company-icon { display: none; }
+  .nav-collapse-toggle { display: grid; place-items: center; flex: none; width: var(--control-height); height: var(--control-height); color: var(--tool-muted); border-radius: var(--radius-6); }
+  .ui-icon { width: var(--icon-size); height: var(--icon-size); flex: none; }
+  .nav-collapse-toggle:hover { background: var(--tool-hover); color: var(--tool-ink); }
+  .nav-section-label { color: var(--tool-muted); font-size: var(--type-metadata-size); letter-spacing: 0; text-transform: none; }
+  .nav-group { margin-bottom: var(--space-8); }
+  .nav-group-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; padding: var(--space-12) var(--space-24) var(--space-4); font-size: var(--type-metadata-size); font-weight: 500; letter-spacing: 0; text-transform: none; text-align: left; }
+  .nav-group-toggle:hover { color: var(--tool-ink); }
+  .nav-group-icon { display: none; }
+  .nav-item { color: var(--tool-ink); min-height: var(--control-height); transition: background-color var(--duration-fast), color var(--duration-fast); }
+  .nav-item:hover { background: var(--tool-hover); color: var(--tool-ink); }
+  .nav-item-active, .nav-item-active:hover { background: var(--tool-selected); color: var(--tool-ink); box-shadow: inset 2px 0 var(--focus-color); }
+  .nav-icon { width: var(--icon-size); height: var(--icon-size); flex: none; }
+  .nav-list li + li { margin-top: 1px; }
+  .nav-flyout { margin-left: 0; background: var(--material-panel); color: var(--foreground); border-color: var(--material-line); border-radius: var(--radius-8); box-shadow: var(--shadow-popover); }
+  .nav-flyout a { color: inherit; }
+  .nav-flyout a:hover { background: var(--tool-hover); color: inherit; }
+  .workspace-tools { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: var(--space-16); min-height: var(--toolbar-height); padding-inline: var(--workspace-gutter); border-bottom: 1px solid var(--border-subtle); background: var(--surface); }
+  .workspace-context { flex: 1; }
+  .workspace-currency { flex: none; border-left: 1px solid var(--border-subtle); padding-left: var(--space-12); }
+  .workspace-search { flex: none; width: min(240px, 100%); }
+  .workspace-search input { height: var(--control-height); }
+  .ledger-canvas > .ledger-canvas-wrap > main:not([data-centered-paper]) > a.ui-tool:first-child:has(+ h1, + .ui-page-header, + div > h1) { float: left; margin-right: 10px; }
+  .nav-settings { margin-top: auto; border: 0; padding-top: var(--space-16); }
+  .nav-mobile-close { color: var(--tool-ink); border-color: var(--material-line); }
+  .nav-action { color: var(--tool-ink); background: var(--tool-hover); }
+  .nav-action:hover { background: var(--tool-selected); }
+  .nav-action-active { background: var(--tool-selected); box-shadow: inset 2px 0 var(--focus-color); }
+  .nav-flyout-toggle { display: grid; place-items: center; flex: none; width: 24px; height: var(--control-height); margin-right: var(--space-4); border-radius: var(--radius-6); color: var(--tool-muted); text-align: center; }
+  .nav-flyout-toggle:hover, .nav-flyout-toggle:focus-visible { background: var(--tool-hover); color: var(--tool-ink); }
+  .nav-mobile-trigger, .nav-mobile-backdrop { display: none; }
+
+  .overlay-surface, .floating-surface {
+    --overlay-gutter: clamp(var(--space-16), 3vw, var(--space-32));
+    background: var(--material-overlay);
+    border: 1px solid var(--material-line);
+    border-radius: var(--radius-12);
+    box-shadow: var(--shadow-overlay);
+  }
+  .overlay-header { background: var(--surface-elevated); padding: var(--space-8) var(--overlay-gutter); border-bottom: 1px solid var(--border-subtle); }
+  .overlay-close { display: grid; place-items: center; width: var(--control-height); height: var(--control-height); }
+  select.ui-field:not([multiple]):not([size]) {
+    appearance: none;
+    padding-right: 34px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m2 2 4 4 4-4' fill='none' stroke='%23665f4f' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-position: right 12px center;
+    background-size: 12px 8px;
+    background-repeat: no-repeat;
+  }
+  :root[data-mode="dark"] select.ui-field:not([multiple]):not([size]) { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m2 2 4 4 4-4' fill='none' stroke='%23c8d3ba' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+  .picker-option[aria-selected="true"] { background: var(--surface-selected); font-weight: var(--weight-label); }
+  .ui-page-header { align-items: center; }
+  .range-picker { color: var(--foreground); }
+  .range-dates { flex: 0 1 18rem; }
+  .range-dates label { flex: 1 1 8rem; }
+  .range-dates input { width: 100%; min-width: 0; }
+  .range-preset[aria-pressed="false"] { background: var(--material-panel); color: var(--foreground); border-color: var(--material-line); font-weight: 500; }
+  .range-preset[aria-pressed="false"]:hover { background: var(--color-neutral-100); }
+  .form-section-heading { border-top: 1px solid var(--material-line); padding-top: 16px; }
+  .invoice-lines > div:first-child { font-size: 13px; text-transform: none; letter-spacing: 0; color: color-mix(in srgb, var(--foreground) 75%, var(--material-panel)); }
+  .task-register { overflow: hidden; border: 1px solid var(--material-line); border-radius: var(--radius-8); background: var(--material-panel); }
+  .task-group + .task-group { border-top: 1px solid var(--material-line); }
+  .task-group > summary { min-height: 48px; padding-block: 10px; }
+  .task-group > summary:hover { background: color-mix(in srgb, var(--material-panel) 60%, var(--material-work)); }
+  .task-group > summary:focus-visible { outline-offset: -3px; }
+  .task-count { color: color-mix(in srgb, var(--foreground) 75%, var(--material-panel)); }
+  .task-group[data-has-tasks] .task-count { color: var(--foreground); }
+  .task-body { border-top: 1px solid var(--material-line); }
+  .task-body a { overflow-wrap: anywhere; }
+  .party-register .register-section :is(th, td) { padding-block: 12px; color: var(--foreground); font-size: 13px; font-weight: 600; text-transform: none; letter-spacing: 0; background: var(--material-work); }
+  .party-register .register-group :is(th, td) { padding-block: 10px; border-bottom: 1px solid var(--material-line); }
+  .ui-card { background: var(--material-panel); border-color: var(--material-line); }
+  :where(button, a, input, select, textarea, summary):focus-visible {
+    outline: var(--focus-width) solid var(--focus-color);
+    outline-offset: var(--focus-offset);
+  }
+
+  .ledger-canvas-wrap { padding: 0; }
+  .ledger-canvas {
+    position: relative;
+    background: var(--material-work);
+    color: var(--foreground);
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .ledger-canvas > .ledger-canvas-wrap > main:not([data-centered-paper]) { padding-block: var(--space-24); }
+  :is(.ledger-canvas main, .standalone-canvas, .ui-page-header) h1 { font-size: var(--type-page-size); font-weight: var(--weight-heading); letter-spacing: var(--tracking-heading); line-height: var(--type-page-line); }
+  .ledger-canvas main h2 { letter-spacing: var(--tracking-heading); }
+  .ledger-canvas .font-serif, .standalone-canvas .font-serif { font-family: var(--font-sans); }
+
+  .ledger-canvas main :where(section, article, aside, div)[class~="rounded"][class~="border"],
+  .ledger-canvas main :where(section, article, aside, div)[class~="rounded-lg"][class~="border"] {
+    border-radius: var(--radius-8);
+  }
+  .ledger-canvas :where(button, select, input:not([type="checkbox"]):not([type="radio"]), textarea):not([class~="rounded-full"]) {
+    border-radius: var(--radius-6);
+  }
+  .ledger-canvas main:not([data-centered-paper]) table {
+    border: 0;
+    border-radius: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--surface);
+    font-size: var(--type-label-size);
+  }
+  .ledger-canvas main:not([data-centered-paper]) table thead { background: var(--surface-secondary); }
+  .ledger-canvas main:not([data-centered-paper]) table thead :is(tr, th) { color: var(--text-secondary); font-size: var(--type-label-size); letter-spacing: 0; text-transform: none; }
+  .ledger-canvas main:not([data-centered-paper]) table thead th { border-bottom: 1px solid var(--material-line); padding-block: var(--space-4); height: var(--control-height); font-weight: var(--weight-label); }
+  .ledger-canvas main:not([data-centered-paper]) tbody tr[data-row]:hover,
+  .ledger-canvas main:not([data-centered-paper]) tbody tr:focus-within { background: var(--surface-hover); }
+  .ledger-canvas main:not([data-centered-paper]) table :is(th, td):first-child { --table-edge-gutter: var(--space-16); padding-inline: var(--space-16); }
+  .ledger-canvas main:not([data-centered-paper]) table :is(th, td):last-child { padding-right: var(--space-16); }
+  .ledger-canvas main:not([data-centered-paper]) table tr:last-child td { border-bottom: 0; }
+
+  .standalone-canvas {
+    background: var(--material-work);
+    border: 1px solid var(--color-neutral-200);
+    border-radius: var(--radius-8);
+    box-shadow: none;
+  }
+  .standalone-company { transition: border-color .16s; }
+  .standalone-company:hover { border-color: var(--color-neutral-400); }
+
+  :root[data-mode="dark"] .desk-tab-active { background: var(--material-work); color: var(--foreground); }
+  :root[data-mode="dark"] .ledger-canvas { background: var(--material-work); color: var(--foreground); }
+  :root[data-mode="dark"] .standalone-canvas { background: var(--color-neutral-950); border-color: var(--color-neutral-700); }
+  :root[data-theme="liquid"] .desk-shell { background: var(--liquid-page); }
+  :root[data-theme="liquid"] .desk-bar {
+    background-color: var(--material-tool);
+    -webkit-backdrop-filter: blur(20px) saturate(130%);
+    backdrop-filter: blur(20px) saturate(130%);
+  }
+  :root[data-theme="liquid"] .ledger-workspace { background: var(--liquid-page); }
+  :root[data-theme="liquid"] .overlay-surface,
+  :root[data-theme="liquid"] .floating-surface { background: var(--material-overlay); }
+  :root[data-theme="liquid"] .ledger-canvas,
+  :root[data-theme="liquid"] .standalone-canvas { background: var(--material-work); }
+}
+
+@media screen and (min-width: 881px) {
+  /* 12px bar gutter + 52px brand + 8px gap = the 72px collapsed rail. */
+  .desk-shell[data-collapsed="true"] .desk-brand { min-width: 52px; }
+  .desk-shell[data-collapsed="true"] .desk-brand span { display: none; }
+  .nav-rail[data-collapsed="true"] { width: var(--sidebar-collapsed-width); }
+  .nav-rail[data-collapsed="true"] .nav-company { flex-direction: column-reverse; padding-inline: 12px; }
+  .nav-rail[data-collapsed="true"] .nav-company-link { flex: none; width: 44px; min-height: 40px; justify-content: center; padding: 10px; }
+  .nav-rail[data-collapsed="true"] .nav-company-icon { display: block; }
+  .nav-rail[data-collapsed="true"] :is(.nav-company-name, .nav-company-chevron, .nav-item-label, .nav-action-label, .nav-group-name, .nav-group-chevron, .nav-section-label:not(.nav-group-toggle)) { display: none; }
+  .nav-rail[data-collapsed="true"] .nav-group-toggle { justify-content: center; width: 44px; min-height: 40px; margin-inline: 12px; padding: 10px; border-radius: var(--radius-6); }
+  .nav-rail[data-collapsed="true"] .nav-group-icon { display: block; }
+  .nav-rail[data-collapsed="true"] .nav-actions { padding-inline: 12px; }
+  .nav-rail[data-collapsed="true"] .nav-actions > div:first-child { grid-template-columns: 1fr; }
+  .nav-rail[data-collapsed="true"] .nav-action { display: flex; align-items: center; justify-content: center; min-height: 40px; padding: 0; font-size: 18px; }
+  .nav-rail[data-collapsed="true"] .nav-list { padding-inline: 12px; }
+  .nav-rail[data-collapsed="true"] .nav-item { justify-content: center; min-height: 40px; padding: 10px; }
+  .nav-rail[data-collapsed="true"] .nav-item-row { position: relative; }
+  .nav-rail[data-collapsed="true"] .nav-flyout-toggle { position: absolute; right: -10px; width: 16px; height: 28px; margin: 0; }
+  .nav-rail[data-collapsed="true"] .nav-group + .nav-group { border-top: 1px solid var(--material-line); padding-top: 7px; }
+  .nav-rail[data-collapsed="true"] .nav-settings { padding-inline: 12px; }
+}
+@media (forced-colors: active) {
+  select.ui-field:not([multiple]):not([size]) { appearance: auto !important; background-image: none !important; }
+}
+
+@media screen and (prefers-color-scheme: dark) {
+  :root[data-mode="system"] select.ui-field:not([multiple]):not([size]) { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m2 2 4 4 4-4' fill='none' stroke='%23c8d3ba' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+  :root[data-mode="system"] .desk-tab-active { background: var(--material-work); color: var(--foreground); }
+  :root[data-mode="system"] .ledger-canvas { background: var(--material-work); color: var(--foreground); }
+  :root[data-mode="system"] .standalone-canvas { background: var(--color-neutral-950); border-color: var(--color-neutral-700); }
+}
+
+@media screen and (max-width: 880px) {
+  /* The Desk bar is outside this ledger iframe; reserve only the local nav row. */
+  .nav-mobile-trigger { display: flex; position: fixed; top: 12px; left: 12px; z-index: 35; align-items: center; gap: 9px; max-width: calc(100vw - 206px); height: 38px; padding: 0 11px; border: 1px solid var(--material-line); border-radius: var(--radius-6); background: var(--material-panel); color: var(--foreground); font-weight: 600; box-shadow: 0 2px 8px #0001; }
+  .nav-mobile-backdrop { display: block; position: fixed; inset: 0; z-index: 38; width: 100%; background: #0008; }
+  .nav-rail { position: fixed; height: 100vh; inset: 0 auto 0 0; z-index: 39; width: min(280px, 85vw); overflow-y: auto; transform: translateX(-100%); visibility: hidden; transition: transform .18s; }
+  .nav-rail-open { transform: translateX(0); visibility: visible; }
+  .nav-collapse-toggle { display: none; }
+  .workspace-tools { position: sticky; width: auto; justify-content: flex-end; min-height: 52px; padding: var(--space-8) var(--space-16); }
+  .workspace-context { display: none; }
+  .workspace-search { width: 170px; }
+  .nav-flyout { position: static; width: auto; min-width: 0; margin: 3px 0 7px 16px; box-shadow: none; }
+  .desk-brand { min-width: 48px; margin-right: 0; }
+  .desk-brand span { display: none; }
+  .ledger-canvas-wrap { padding: 0; }
+  .ledger-canvas { border-radius: 0; }
+  .standalone-canvas { border-radius: var(--radius-8); }
+  [data-ledger-content] > .ledger-canvas-wrap > main:not([data-centered-paper]) { padding-inline: 1.25rem; }
+  .ledger-canvas > .ledger-canvas-wrap > main:not([data-centered-paper]) { padding-top: 1rem; }
+}
+
+@media screen and (max-width: 560px) {
+  .desk-bar { padding-inline: 9px; gap: 7px; }
+  .desk-tab { max-width: 145px; padding-inline: 8px; }
+  [data-ledger-content] > .ledger-canvas-wrap > main:not([data-centered-paper]) { padding-inline: 1rem; }
+  .standalone-canvas { margin-inline: 8px; padding-inline: 1rem; }
+}
+
+/* Layout safety is a component default, not an override of explicit utility
+ * widths or typography. Tailwind's utilities layer owns max-w-sm, caption
+ * line heights, and other declared variants in both pages and overlays. */
+@layer components {
+  @media screen {
+    .ui-label { line-height: var(--type-label-line); }
+    .overlay-content :where(form, label, input, select, textarea, [data-picker]) { max-width: 100%; }
+    .overlay-content :where(label, [data-picker]) { min-width: 0; }
+    .ledger-canvas :where(form, label, fieldset), .ledger-canvas .ui-field { min-width: 0; max-width: 100%; }
+  }
+}
+
+/* Stable forms and tables: only the data grid needs a minimum width. */
+@media screen {
+  .overlay-content { min-width: 0; padding-inline: var(--overlay-gutter); padding-top: var(--space-16); }
+  .overlay-content h1, .overlay-content > h2 { font-size: var(--type-page-size); line-height: var(--type-page-line); font-weight: var(--weight-heading); }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--form-column-min)), 1fr)); gap: var(--space-12); }
+  .form-grid > * { min-width: 0; }
+  .form-grid > .form-actions { grid-column: 1 / -1; }
+  .form-grid > :is([role="alert"], [role="status"]) { grid-column: 1 / -1; }
+  .form-grid > :where(label, div) { width: auto; }
+  .form-grid :where(input, select, textarea) { width: 100%; }
+  .invoice-lines { min-width: 60rem; padding-bottom: 8px; }
+  .table-scroll { max-width: 100%; min-width: 0; overflow: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
+  .table-scroll > table { display: table; overflow: visible; }
+  .form-actions { position: sticky; bottom: 0; z-index: 5; display: flex; justify-content: flex-end; gap: var(--space-8); margin-top: var(--space-20); padding-block: var(--space-12); border-top: 1px solid var(--material-line); background: var(--material-overlay); }
+  .picker-menu { inset: auto; margin: 0; padding: var(--space-4); border-radius: var(--radius-8); color: var(--foreground); background: var(--material-panel); border-color: var(--material-line); box-shadow: var(--shadow-popover); }
+  .picker-menu::backdrop { background: transparent; }
+  .unsaved-dialog { width: min(28rem, calc(100vw - 32px)); margin: auto; padding: var(--space-24); border: 1px solid var(--material-line); border-radius: var(--radius-12); background: var(--material-overlay); color: var(--foreground); }
+  .unsaved-dialog::backdrop { background: #0006; }
+  .bank-feed-table { min-width: 44rem; }
+  .bank-feed-table[data-feed-tab="pending"] { min-width: 68rem; }
+  .bank-feed-table .ui-button { min-height: var(--control-height); padding-inline: var(--space-8); white-space: nowrap; font-size: var(--type-metadata-size); }
+  .bank-feed-table .ui-field { min-height: var(--control-height); font-size: var(--type-label-size); }
+}
+@media screen and (min-width: 640px) {
+  .entry-header { grid-template-columns: 10rem minmax(0, 1fr) minmax(0, 1fr); }
+  .quick-header { grid-template-columns: 10rem minmax(0, 1fr); }
+  .invoice-parties { grid-template-columns: minmax(0, .7fr) repeat(2, minmax(0, 1fr)); }
+  .bank-resolve-cell { position: sticky; right: 0; z-index: 2; background: var(--material-panel); border-left: 1px solid var(--material-line); padding-left: 8px; }
+}
+@media screen and (max-width: 560px) {
+  .overlay-surface, .floating-surface { inset: 8px; width: calc(100% - 16px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-rail, .desk-tab, .nav-item, .standalone-company { transition: none !important; }
+}
+
+@media screen and (prefers-reduced-transparency: reduce) {
+  :root[data-theme="liquid"] :is(.desk-bar, .nav-rail, .nav-flyout) { -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+
+/* A statement handed to an accountant should look like a statement, not like a
+   web page with its navigation cut off. */
+@media print {
+  @page { margin: 18mm 16mm; }
+
+  :root { color-scheme: light !important; }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 10.5pt;
+  }
+
+  /* Links to elsewhere mean nothing on paper. */
+  a { color: inherit !important; text-decoration: none !important; }
+
+  main { max-width: none !important; padding: 0 !important; }
+
+  /* Anything that only exists to be clicked. */
+  .print\:hidden, button, form, nav, input, select, textarea { display: none !important; }
+
+  /* Keep a table together where the paper allows it. */
+  table { page-break-inside: auto; width: 100%; }
+  tr    { page-break-inside: avoid; page-break-after: auto; }
+  thead { display: table-header-group; }
+
+  /* Borders that survive being printed on a monochrome printer. */
+  .border-b, .border-t, .border-y { border-color: #999 !important; }
+}
+
+/* Every table scrolls sideways at phone width, in one place: forty-six
+   screens carry tables and six had wrappers (whole-project audit,
+   2026-09-13). display:block keeps the rows a table inside a scrollable
+   box; wide screens are untouched. */
+@media screen and (max-width: 767px) {
+  main table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+@media print {
+  .desk-bar, .nav-mobile-trigger, .nav-mobile-backdrop { display: none !important; }
+  .ledger-workspace { display: block; }
+  .ledger-canvas-wrap, .ledger-canvas, .table-scroll { overflow: visible !important; }
+  .ledger-canvas, .overlay-surface, .floating-surface, main table { background: #fff !important; color: #000 !important; }
+  main :where([class*="dark:text-"]) { color: inherit !important; }
+}
+
+@media (pointer: coarse) { :is(.ui-tool, .ui-button) { min-height: var(--control-touch-height); } .ui-tool { min-width: var(--control-touch-height); } }
+
+@layer components {
+  @media screen {
+    .party-ledger-workspace { display: block; min-width: 0; }
+    .party-directory { padding: var(--space-12) var(--workspace-gutter) 0; }
+    .party-ledger-content { min-width: 0; padding-top: var(--space-12); }
+    .ui-context-directory summary::-webkit-details-marker,
+    .ui-more-filters summary::-webkit-details-marker { display: none; }
+    .ui-field[aria-invalid="true"] { border-color: var(--danger-line); }
+  }
+}
+
+.desk-tab { cursor: grab; }
+.desk-tab:active { cursor: grabbing; }
+.desk-tab[data-drop="before"] { box-shadow: inset 2px 0 var(--color-clay-500); }
+.desk-tab[data-drop="after"] { box-shadow: inset -2px 0 var(--color-clay-500); }
+
+/* Shared dense work surfaces. Paper exports retain their existing layout. */
+@layer components {
+@media screen {
+  .ui-table-viewport { border-block: 1px solid var(--border-subtle); }
+  .ui-table > thead { color: var(--text-secondary); text-align: left; background: var(--surface); }
+  .ui-table > thead > tr > th { padding-block: var(--space-8); font-weight: var(--weight-label); border-bottom: 1px solid var(--border-default); }
+  .ui-table:focus-within > tbody > tr:focus-within { background: var(--surface-hover); }
+  .ui-table > tbody > tr > :is(th, td) { height: var(--control-height); padding-block: var(--space-4); border-bottom: 1px solid var(--border-subtle); vertical-align: top; }
+  .ui-table > tbody > tr:hover { background: var(--surface-hover); }
+  .ui-table > tbody > tr[aria-selected="true"], .ui-table > tbody > tr[data-selected="true"] { background: var(--surface-selected); }
+  .ui-table :is(th, td)[data-numeric] { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .ui-table :is(th, td)[data-date] { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .ui-table-spaced > :is(thead, tbody, tfoot) > tr > :is(th, td) { padding-inline: var(--space-8); }
+  .ui-filter-bar { margin-block: var(--space-16); }
+  .ui-form-section + .ui-form-section { margin-top: var(--space-20); border-top: 1px solid var(--border-subtle); padding-top: var(--space-16); }
+  .ui-form-section legend { padding: 0; }
+  .ui-line-preview, .ledger-canvas main table.ui-line-preview { border: 0; border-radius: 0; background: transparent; }
+  .ledger-canvas main table.ui-line-preview td:first-child { padding-inline: 0 var(--space-8); white-space: nowrap; width: auto; }
+  .ledger-canvas main table.ui-line-preview td:last-child { padding-right: 0; }
+  .party-register .register-section :is(th, td), .party-register .register-group :is(th, td) { padding-block: var(--space-8); }
+}
+
+}
+
+@media screen {
+  /* An explicit table density contract; reading tables retain multiline cell padding. */
+  .ui-table[data-density="compact"] > tbody > tr > :is(th, td) { padding-block: var(--space-4); }
+  .entry-details .form-grid { grid-template-columns: minmax(8rem, 10rem) minmax(12rem, 1fr) minmax(10rem, 14rem); }
+  .journal-grid { max-height: min(52vh, 32rem); }
+  .journal-grid > table > tbody > tr > td { padding-block: var(--space-4); }
+  .journal-grid thead { position: sticky; top: 0; z-index: 2; }
+  .journal-totals { position: sticky; bottom: 0; z-index: 4; display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-12); padding: var(--space-12) var(--space-16); background: var(--surface-secondary); border-bottom: 1px solid var(--border-default); font-size: var(--type-label-size); }
+}
+@media screen and (max-width: 760px) { .entry-details .form-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); } }

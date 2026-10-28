@@ -1,0 +1,15 @@
+{
+  "upstream": {
+    "name": "braces",
+    "version": "3.0.3",
+    "resolved": "https://registry.npmjs.org/braces/-/braces-3.0.3.tgz",
+    "integrity": "sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA=="
+  },
+  "license": "MIT",
+  "advisory": "GHSA-vfj7-8cjw-p6xm",
+  "advisoryUrl": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+  "kind": "FigTree local patch; not an upstream release",
+  "changes": "Iteratively bound AST depth and traversal work before recursive walkers, including supplied ASTs and incomplete patterns",
+  "maxDepth": 128,
+  "maxNodes": 200000
+}

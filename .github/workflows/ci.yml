@@ -1,0 +1,86 @@
+name: Banyan checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 7 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: banyan-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  security:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '26'
+          cache: npm
+      - run: npm ci
+      - run: npm run security:dependencies
+      - run: npm run security:secrets
+      - run: npm run security:probe
+  verify:
+    runs-on: ubuntu-24.04
+    env:
+      DATABASE_URL: postgresql://figtree_ci:disposable-ci-only@localhost:55432/figtree_ci_app
+      TEST_DATABASE_URL: postgresql://figtree_ci:disposable-ci-only@localhost:55432/figtree_ci_test
+      TEST_DATABASE_CONFIRMATION: figtree_ci_test
+      ATTACHMENTS_DIR: /tmp/figtree-ci-attachments
+      PROJECT_ATTACHMENTS_DIR: /tmp/figtree-ci-project-attachments
+      PG_BIN: /usr/lib/postgresql/17/bin
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '26'
+          cache: npm
+      - run: npm ci
+      - name: Install matching PostgreSQL 17 server and client tools
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl --fail --silent --show-error --location --output /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          printf '%s\n' 'Types: deb' 'URIs: https://apt.postgresql.org/pub/repos/apt' 'Suites: noble-pgdg' 'Components: main' 'Signed-By: /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc' | sudo tee /etc/apt/sources.list.d/pgdg.sources > /dev/null
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends postgresql-17 postgresql-client-17 poppler-utils
+          "$PG_BIN/pg_dump" --version
+      # A fresh loopback-only cluster avoids shared registry pull-rate failures.
+      # The service role/APP/confirmed TEST remain disposable and separate.
+      - name: Start isolated PostgreSQL 17
+        run: |
+          install -d -m 700 "$RUNNER_TEMP/figtree-ci-pg"
+          printf '%s\n' 'disposable-ci-only' > "$RUNNER_TEMP/figtree-ci-password"
+          chmod 600 "$RUNNER_TEMP/figtree-ci-password"
+          "$PG_BIN/initdb" -D "$RUNNER_TEMP/figtree-ci-pg" -U figtree_ci --pwfile="$RUNNER_TEMP/figtree-ci-password" --auth-host=scram-sha-256 --auth-local=peer --encoding=UTF8 --locale=C.UTF-8
+          "$PG_BIN/pg_ctl" -D "$RUNNER_TEMP/figtree-ci-pg" -l "$RUNNER_TEMP/figtree-ci-postgres.log" -o "-h 127.0.0.1 -p 55432 -k $RUNNER_TEMP/figtree-ci-pg" -w start
+          "$PG_BIN/createdb" --maintenance-db="${DATABASE_URL%/*}/postgres" figtree_ci_app
+          "$PG_BIN/createdb" --maintenance-db="${DATABASE_URL%/*}/postgres" figtree_ci_test
+      - run: npx tsx scripts/ci-env.ts
+      - run: npm run db:migrate -- --database figtree_ci_app
+      - run: npm run lint
+      - run: npx playwright install --with-deps chromium
+      # The battery includes typecheck, build and db:verify-p1.
+      - run: npm run db:suites
+      - run: npm run p1:mutations
+      - run: npm run p1:browser
+      - run: npm run p1:restore
+      - run: npm run db:mutations-p2
+      - run: npm run test:p2-browser
+      - run: npm run test:p2-crash
+      - run: npm run test:p2-restore
+      - run: npm run db:mutations-p3
+      - name: Stop isolated PostgreSQL
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/figtree-ci-pg/postmaster.pid" ]; then
+            "$PG_BIN/pg_ctl" -D "$RUNNER_TEMP/figtree-ci-pg" -m fast -w stop
+          fi

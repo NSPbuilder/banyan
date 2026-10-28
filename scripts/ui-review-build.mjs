@@ -1,0 +1,8 @@
+import {mkdtemp,cp,symlink,writeFile,constants} from 'node:fs/promises';import {spawnSync} from 'node:child_process';import {tmpdir} from 'node:os';import {join} from 'node:path';import {parse} from 'dotenv';import {readFile} from 'node:fs/promises';
+const root=process.cwd(),out=join(root,'docs/evidence/ui-completion-2026-10-08'),s=await mkdtemp(join(tmpdir(),'figtree-ui-completion-build-'));
+const proof=JSON.parse(await readFile(join(root,'docs/evidence/p6/isolation.json'),'utf8')),cfg=parse(await readFile(proof.environmentPath));if(!proof.createdNew||proof.productionTouched||new URL(cfg.DATABASE_URL).pathname.slice(1)!==proof.applicationDatabase)throw Error('Unconfirmed isolation');
+for(const p of ['src','public','scripts','db/migrations','package.json','package-lock.json','tsconfig.json','next.config.ts','postcss.config.mjs','next-env.d.ts','eslint.config.mjs'])await cp(join(root,p),join(s,p),{recursive:true,mode:constants.COPYFILE_FICLONE});await symlink(join(root,'node_modules'),join(s,'node_modules'),'dir');
+await writeFile(join(out,'build-state.json'),JSON.stringify({scratch:s,out},null,2)+'\n');
+const env={...process.env,...cfg,NODE_OPTIONS:'',NODE_ENV:'production'};
+const r=spawnSync('node',[join(s,'node_modules/next/dist/bin/next'),'build','--webpack'],{cwd:s,env,encoding:'utf8',maxBuffer:30e6});await writeFile(join(out,'build.log'),r.stdout+r.stderr);console.log('Production build exit',r.status,'scratch',s);if(r.status!==0)process.exit(r.status||1);
+const t=spawnSync('npm',['run','typecheck'],{cwd:s,env,encoding:'utf8',maxBuffer:30e6});await writeFile(join(out,'typecheck.log'),t.stdout+t.stderr);console.log('Typecheck exit',t.status);if(t.status!==0)process.exit(t.status||1);

@@ -1,0 +1,27 @@
+title = "FigTree: default rules with precise non-secret UI values"
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Public localStorage key for navigation collapse"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''(^|/)(src/lib/navigation-display\.ts|src/components/NavRail\.tsx)$''']
+regexTarget = "secret"
+regexes = ['''^erp\.nav\.collapsed\.v1$''']
+
+[[allowlists]]
+description = "Generated journal entry React row key in existing mutation evidence"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''(^|/)docs/evidence/mutations\.md$''']
+regexTarget = "secret"
+regexes = ['''^e[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$''']
+
+[[allowlists]]
+description = "Passkeys preflight reports a boolean expression, not a credential"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''(^|/)docs/evidence/passkeys-enable-2026-10-09/enable\.mjs$''']
+regexTarget = "match"
+regexes = ["^currentPasskeysEnabled:existing\\.PASSKEYS_ENABLED==='$"]

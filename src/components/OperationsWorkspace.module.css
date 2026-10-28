@@ -1,0 +1,17 @@
+.workspace{min-width:0;max-width:1440px;margin-inline:auto;padding:24px 28px 40px;display:flex;flex-direction:column;gap:24px}
+.workspace :global(.ui-page-header) h1{font-size:26px;line-height:32px;letter-spacing:-.5px}
+.tabs{display:flex;gap:28px;border-bottom:1px solid var(--color-line-subtle);overflow-x:auto;white-space:nowrap;scrollbar-width:thin}
+.tab{padding:0 0 12px;color:var(--color-ink-secondary);border-bottom:2px solid transparent;text-decoration:none}
+.tab[aria-current=page]{color:var(--color-ink);border-color:var(--color-action);font-weight:600}
+.tab:focus-visible{outline:2px solid var(--color-focus);outline-offset:-2px}
+.flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--color-line-subtle);border-radius:8px;background:var(--color-surface);overflow:hidden}
+.stage{padding:20px 24px;min-width:0;border-right:1px solid var(--color-line-subtle)}
+.stage:last-child{border-right:0}.stage p{margin:0}.stageValue{font-size:24px;line-height:32px;letter-spacing:-.4px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:auto;margin-block:6px 4px}
+.stageMeta{font-size:12px;line-height:18px;color:var(--color-ink-muted)}
+.summary{display:flex;flex-wrap:wrap;gap:24px 48px;padding:20px 0;border-block:1px solid var(--color-line-subtle)}
+.summary dt{font-size:12px;color:var(--color-ink-muted)}.summary dd{font-size:24px;line-height:32px;font-variant-numeric:tabular-nums;margin:4px 0 0}
+.workDetail{display:grid;grid-template-columns:minmax(0,2fr) minmax(220px,1fr);gap:32px}.panel{border-top:1px solid var(--color-line-subtle);padding-top:20px;min-width:0}
+.panel h2{font-size:18px;font-weight:600;margin-bottom:16px}
+@media(max-width:760px){.workspace{padding:20px 16px 32px;gap:20px}.tabs{gap:22px}.stage{padding:14px}.stageValue{font-size:19px;line-height:28px}.workDetail{grid-template-columns:1fr}.summary{gap:16px 28px}.summary dd{font-size:21px}}
+@media(max-width:400px){.workspace{padding-inline:12px}.flow{grid-template-columns:1fr}.stage{border-right:0;border-bottom:1px solid var(--color-line-subtle);display:grid;grid-template-columns:1fr 1fr;gap:4px 10px}.stage:last-child{border-bottom:0}.stageValue{margin:0;text-align:right}.stageMeta{grid-column:1/-1}.workspace :global(.ui-page-header) h1{font-size:24px}}
+@media print{.workspace{padding:0;max-width:none}.tabs{display:none}}

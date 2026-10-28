@@ -1,0 +1,271 @@
+[
+  {
+    "pattern": "a/{b,c}/d",
+    "compiled": "a/(b|c)/d",
+    "expanded": [
+      "a/b/d",
+      "a/c/d"
+    ],
+    "stringified": "a/{b,c}/d",
+    "default": [
+      "a/(b|c)/d"
+    ]
+  },
+  {
+    "pattern": "{1..5}",
+    "compiled": "([1-5])",
+    "expanded": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "stringified": "{1..5}",
+    "default": [
+      "([1-5])"
+    ]
+  },
+  {
+    "pattern": "{a..d}",
+    "compiled": "([a-d])",
+    "expanded": [
+      "a",
+      "b",
+      "c",
+      "d"
+    ],
+    "stringified": "{a..d}",
+    "default": [
+      "([a-d])"
+    ]
+  },
+  {
+    "pattern": "{01..03}",
+    "compiled": "(0[1-3])",
+    "expanded": [
+      "01",
+      "02",
+      "03"
+    ],
+    "stringified": "{01..03}",
+    "default": [
+      "(0[1-3])"
+    ]
+  },
+  {
+    "pattern": "file.{js,ts}",
+    "compiled": "file.(js|ts)",
+    "expanded": [
+      "file.js",
+      "file.ts"
+    ],
+    "stringified": "file.{js,ts}",
+    "default": [
+      "file.(js|ts)"
+    ]
+  },
+  {
+    "pattern": "{foo,{bar,baz}}",
+    "compiled": "(foo|(bar|baz))",
+    "expanded": [
+      "foo",
+      "bar",
+      "baz"
+    ],
+    "stringified": "{foo,{bar,baz}}",
+    "default": [
+      "(foo|(bar|baz))"
+    ]
+  },
+  {
+    "pattern": "a\\{b,c\\}",
+    "compiled": "a{b,c}",
+    "expanded": [
+      "a{b,c}"
+    ],
+    "stringified": "a{b,c}",
+    "default": [
+      "a{b,c}"
+    ]
+  },
+  {
+    "pattern": "\"{a,b}\"",
+    "compiled": "{a,b}",
+    "expanded": [
+      "{a,b}"
+    ],
+    "stringified": "{a,b}",
+    "default": [
+      "{a,b}"
+    ]
+  },
+  {
+    "pattern": "${name}",
+    "compiled": "${name}",
+    "expanded": [
+      "${name}"
+    ],
+    "stringified": "${name}",
+    "default": [
+      "${name}"
+    ]
+  },
+  {
+    "pattern": "{x,}",
+    "compiled": "(x|)",
+    "expanded": [
+      "x",
+      ""
+    ],
+    "stringified": "{x,}",
+    "default": [
+      "(x|)"
+    ]
+  },
+  {
+    "pattern": "{a,,b}",
+    "compiled": "(a|b)",
+    "expanded": [
+      "a",
+      "",
+      "b"
+    ],
+    "stringified": "{a,,b}",
+    "default": [
+      "(a|b)"
+    ]
+  },
+  {
+    "pattern": "{a,b}{c,d}",
+    "compiled": "(a|b)(c|d)",
+    "expanded": [
+      "ac",
+      "ad",
+      "bc",
+      "bd"
+    ],
+    "stringified": "{a,b}{c,d}",
+    "default": [
+      "(a|b)(c|d)"
+    ]
+  },
+  {
+    "pattern": "(a|b)",
+    "compiled": "(a|b)",
+    "expanded": [
+      "(a|b)"
+    ],
+    "stringified": "(a|b)",
+    "default": [
+      "(a|b)"
+    ]
+  },
+  {
+    "pattern": "foo/[ab]/{x,y}",
+    "compiled": "foo/[ab]/(x|y)",
+    "expanded": [
+      "foo/[ab]/x",
+      "foo/[ab]/y"
+    ],
+    "stringified": "foo/[ab]/{x,y}",
+    "default": [
+      "foo/[ab]/(x|y)"
+    ]
+  },
+  {
+    "pattern": "{-2..2}",
+    "compiled": "(-[12]|[0-2])",
+    "expanded": [
+      "-2",
+      "-1",
+      "0",
+      "1",
+      "2"
+    ],
+    "stringified": "{-2..2}",
+    "default": [
+      "(-[12]|[0-2])"
+    ]
+  },
+  {
+    "pattern": "{1..5..2}",
+    "compiled": "(1|3|5)",
+    "expanded": [
+      "1",
+      "3",
+      "5"
+    ],
+    "stringified": "{1..5..2}",
+    "default": [
+      "(1|3|5)"
+    ]
+  },
+  {
+    "pattern": "{{{x}}}",
+    "compiled": "{{{x}}}",
+    "expanded": [
+      "{{{x}}}"
+    ],
+    "stringified": "{{{x}}}",
+    "default": [
+      "{{{x}}}"
+    ]
+  },
+  {
+    "pattern": "alpha",
+    "compiled": "alpha",
+    "expanded": [
+      "alpha"
+    ],
+    "stringified": "alpha",
+    "default": [
+      "alpha"
+    ]
+  },
+  {
+    "pattern": "",
+    "compiled": "",
+    "expanded": [],
+    "stringified": "",
+    "default": [
+      ""
+    ]
+  },
+  {
+    "pattern": "{@,ß}",
+    "compiled": "(@|ß)",
+    "expanded": [
+      "@",
+      "ß"
+    ],
+    "stringified": "{@,ß}",
+    "default": [
+      "(@|ß)"
+    ]
+  },
+  {
+    "pattern": "src/**/*.{ts,tsx}",
+    "compiled": "src/**/*.(ts|tsx)",
+    "expanded": [
+      "src/**/*.ts",
+      "src/**/*.tsx"
+    ],
+    "stringified": "src/**/*.{ts,tsx}",
+    "default": [
+      "src/**/*.(ts|tsx)"
+    ]
+  },
+  {
+    "pattern": "**/{accounts,invoices}/**",
+    "compiled": "**/(accounts|invoices)/**",
+    "expanded": [
+      "**/accounts/**",
+      "**/invoices/**"
+    ],
+    "stringified": "**/{accounts,invoices}/**",
+    "default": [
+      "**/(accounts|invoices)/**"
+    ]
+  }
+]

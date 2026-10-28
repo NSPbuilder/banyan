@@ -1,0 +1,10 @@
+export type OperationsSeat = '/assets' | '/inventory'
+export type AssetGroup = 'land' | 'building' | 'machinery' | 'vehicle' | 'computer'
+export const ASSET_GROUPS: Record<AssetGroup,string> = {land:'Land',building:'Buildings',machinery:'Machinery and equipment',vehicle:'Motor vehicles',computer:'Computer equipment'}
+export type FinanceSetting = {id:string;seat:OperationsSeat;connected_on:string|null;funding_account_id:string|null;oci_account_id:string|null;equity_account_id:string|null;tax_rate_bp:number;tax_rate_note:string;cca_strategy:'maximum'|'match_book';version:number}
+export type FinanceAccount = {key:string;code:string;label:string;kind:string;balance:string;role:string;controlled:boolean;account_id:string|null;account_label:string|null}
+export type ReconciliationRow = FinanceAccount & {register_amount:string;gl_amount:string;difference:string}
+export type FinancialInput = {counterpartAccountId?:string;recoverableTax?:bigint;taxAccountId?:string}
+export type AssetFinancialInput = FinancialInput & {group:AssetGroup;ccaClass?:string;requestKey?:string}
+export type OperationsJournalRow = {id:string;source_kind:string;source_id:string;movement_id:string|null;event_date:string;entry_id:string|null;entry_no:string|null;no_entry_reason:string}
+export type FundingOption={id:string;label:string;kind:string;roles:string[]}

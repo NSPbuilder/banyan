@@ -1,0 +1,21 @@
+.viewport { width: 100%; min-width: 0; overflow: hidden; }
+.frame {
+  position: relative;
+  width: var(--preview-width, 100%);
+  max-width: 100%;
+  height: var(--preview-height, auto);
+  aspect-ratio: 17 / 22;
+  margin-inline: auto;
+  background: #fff;
+}
+.sheet {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 816px;
+  min-height: 1056px;
+  transform: scale(var(--preview-scale, 1));
+  transform-origin: top left;
+  visibility: var(--preview-visibility, hidden);
+}
+.sheet [data-invoice-doc] { min-height: 1056px; }

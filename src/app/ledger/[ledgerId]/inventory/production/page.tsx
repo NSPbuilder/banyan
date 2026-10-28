@@ -1,0 +1,20 @@
+import {requireLedger} from '@/lib/gate'
+import Link from 'next/link'
+import {randomUUID} from 'node:crypto'
+import {notFound} from 'next/navigation'
+import {ledgerHead} from '@/lib/ledger-head'
+import {inventorySettings,inventoryWarehouses} from '@/lib/inventory'
+import {productionBoms,productionOrders} from '@/lib/production'
+import {PageHeader} from '@/components/PageHeader'
+import {RegisterSummary} from '@/components/OperationsWorkspace'
+import {DataTable,TableViewport} from '@/components/Table'
+import {TABLE_ACTION} from '@/lib/ui'
+import {formatQuantity} from '@/lib/quantity'
+import {formatMoney} from '@/lib/money'
+import {localToday} from '@/lib/today'
+import {ProductionOrderForm} from '../ProductionForms'
+import {productionOrderAction} from '../actions'
+export const dynamic='force-dynamic'
+export default async function ProductionPage({params}:{params:Promise<{ledgerId:string}>}){const {ledgerId}=await params;await requireLedger(ledgerId,'/inventory');const [head,orders,boms,settings,warehouses]=await Promise.all([ledgerHead(ledgerId),productionOrders(ledgerId),productionBoms(ledgerId),inventorySettings(ledgerId),inventoryWarehouses(ledgerId)]);if(!head)notFound();const open=orders.filter(o=>o.status==='in_progress')
+  return <div className="space-y-6"><PageHeader title="Production" context={head.entity}><ProductionOrderForm ledgerId={ledgerId} boms={boms} settings={settings} warehouses={warehouses} today={localToday()} requestKey={randomUUID()} action={productionOrderAction}/></PageHeader><RegisterSummary label="Production summary" values={[{label:'Open orders',value:String(open.length)},{label:`WIP in open orders · ${head.currency}`,value:formatMoney(open.reduce((n,o)=>n+BigInt(o.wip_cost),0n))}]}/><TableViewport label="Production orders"><DataTable className="ui-table-spaced min-w-208"><thead><tr><th>Order / recipe</th><th>Output</th><th className="text-right">Completed / planned</th><th className="text-right">WIP ({head.currency})</th><th>Due date</th><th>Status</th></tr></thead><tbody>{orders.map(o=><tr key={o.id}><td><Link href={`/ledger/${ledgerId}/inventory/production/${o.id}`} className={TABLE_ACTION}>PRD-{o.sequence.padStart(6,'0')}</Link><p className="text-metadata text-ink-muted">{o.bom_code} · Version {o.bom_version}</p></td><td>{o.output_sku}<p className="text-metadata text-ink-muted">{o.output_name}</p></td><td className="text-right tabular-nums whitespace-nowrap">{formatQuantity(o.completed_quantity)} / {formatQuantity(o.planned_quantity)} {o.output_unit}</td><td className="text-right tabular-nums">{formatMoney(BigInt(o.wip_cost))}</td><td>{o.due_date??'—'}</td><td>{o.status==='in_progress'?'In progress':o.status==='closed_loss'?'Closed with loss':o.status==='completed'?'Completed':'Cancelled'}</td></tr>)}{!orders.length&&<tr><td colSpan={6} className="py-10 text-center text-ink-muted">Save a BOM, then create an order to start production.</td></tr>}</tbody></DataTable></TableViewport><p className="text-metadata text-ink-muted">Material issues and conversion costs build WIP. Completions receive WIP or finished-goods stock at the allocated cost.</p></div>
+}
