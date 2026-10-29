@@ -3,7 +3,7 @@
   "name": "Banyan",
   "version": "0.0.1",
   "upstreamCommit": "ed0e3a351ac7a8ff6f020487f6cf6f3dfe2a6596",
-  "note": "Banyan0.0.1 CI repair from published commit b888c5da8ad773bb4b23900cc4e76d502eba0f30. Every source file except SOURCE_MANIFEST.json is hashed; runtime environments, stores, history and installed dependencies are excluded.",
+  "note": "Banyan 0.0.1 CI repair from published commit 471833eed9d3c157bee648038bd599cf49a3cd81. Every source file except SOURCE_MANIFEST.json is hashed; runtime environments, stores, history and installed dependencies are excluded.",
   "files": [
     {
       "path": ".env.example",
@@ -19,8 +19,8 @@
     },
     {
       "path": ".github/workflows/ci.yml",
-      "bytes": 3994,
-      "sha256": "39f2dea4c178f26f6200d859c8cdc5358fd150e89d26b088f006589751055c1e",
+      "bytes": 4064,
+      "sha256": "a81ba97e4f71c881ed536761271bdfb108024a10b185d7592898e40db83e1738",
       "mode": "0o644"
     },
     {
@@ -4381,8 +4381,8 @@
     },
     {
       "path": "docs/CI_REPAIR.md",
-      "bytes": 2484,
-      "sha256": "da559ea3ea1ca8f479b51196701cfd2d9bb6973d71589ecaddea9ed5b5904f6e",
+      "bytes": 3416,
+      "sha256": "c92d4d2b2ffe5b65742c6aabb91b15fd669da54b9abae3280453ced1dea77649",
       "mode": "0o644"
     },
     {
@@ -4839,6 +4839,12 @@
       "path": "scripts/p2-crash.ts",
       "bytes": 6679,
       "sha256": "6add1b170b9e649bdc6584a6f2323b68d1089e19bda91c8e9d01f8e147de2516",
+      "mode": "0o644"
+    },
+    {
+      "path": "scripts/p2-layout-baseline.ts",
+      "bytes": 4254,
+      "sha256": "0617f5956a6686b17a0b5d74349fd33e01243de4a0a28f5c14b61ce12637c3bb",
       "mode": "0o644"
     },
     {

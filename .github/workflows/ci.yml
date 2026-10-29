@@ -74,7 +74,8 @@ jobs:
       - run: npm run p1:browser
       - run: npm run p1:restore
       - run: npm run db:mutations-p2
-      - run: npm run test:p2-browser
+      - name: Replay accepted layout and run P2 browser
+        run: npx tsx scripts/p2-layout-baseline.ts
       - run: npm run test:p2-crash
       - run: npm run test:p2-restore
       - run: npm run db:mutations-p3
