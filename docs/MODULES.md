@@ -19,6 +19,8 @@ Run each command with a new output directory; existing output is never overwritt
 
 Build exclusion is different from enabling modules for a company or granting a user access. Configure the company's modules and user grants within the application too. A hidden navigation item alone is not a deployment boundary.
 
-## Current boundary limitation
+## Boundary policy
 
-The module verification suite currently reports the inherited MV4 boundary mismatch `invoice_template_snapshot_frozen -> PROJECT`. This is disclosed, not waived or reclassified as passing. Default full-source behavior and compile checks are verified separately. Treat selective assembly as preview functionality and validate the selection you intend to deploy.
+The original 0.0.1 package inherited an unrecorded dependency: `invoice_template_snapshot_frozen -> PROJECT`. The CI repair explicitly corrects Banyan's initial baseline to accept this already shipped relation. This expands the accepted set by that one relation; it does not remove the underlying runtime coupling. The no-growth ratchet applies after this one-time correction, and other unrecorded dependencies remain rejected.
+
+Default full-source behavior and selective assemblies have different verification scope. Treat selective assembly as preview functionality and validate the selection you intend to deploy. See [CI repair](CI_REPAIR.md).

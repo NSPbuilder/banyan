@@ -1,4 +1,4 @@
-node_modules/
+/node_modules/
 .next/
 build/
 output/
@@ -12,7 +12,7 @@ coverage/
 *.tgz.backup
 *.tsbuildinfo
 next-env.d.ts
-attachments/
+/attachments/
 .nsp/
 .claude/
 .codex/

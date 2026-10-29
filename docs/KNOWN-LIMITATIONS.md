@@ -3,7 +3,7 @@
 Banyan 0.0.1 is an early self-hosted preview, derived from the FigTree 0.0.14 source snapshot. It is not represented as a fully qualified general-purpose ERP or a completed statutory filing service.
 
 - Canadian federal and BC workflows are the focus. Payroll, tax, corporate and SR&ED outputs are working information; confirm applicability, rates and filing requirements for the intended period and jurisdiction.
-- The configured full verification battery has a known inherited module-ownership failure: **MV4**, `invoice_template_snapshot_frozen -> PROJECT`. It remains visible and is not bypassed. Selective module assemblies require their own acceptance.
+- The original package's **MV4** and missing-attachment-route **N12** failures are addressed by the [CI repair](CI_REPAIR.md). The existing Invoice-to-Project runtime coupling remains; selective assemblies still require their own acceptance.
 - **Payment in stages** is invoice/PDF text only. It creates no payment schedule, balances, due dates, aging rules or postings.
 - Attachments in a receipt are appended pages. Supported PDF/image validity and size/page limits apply. Native browser print dialogs, operating-system printers and particular devices need operator acceptance.
 - AI, e-sign, SMTP, payment and inbound-message services require their own setup and may process data outside the host. Live provider acceptance is not implied by local checks.

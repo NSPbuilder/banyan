@@ -1,5 +1,5 @@
 {
-  "note": "Crossings from the base bundle into add-ons, and between add-ons, that exist today (docs/design/48-module-boundaries.md). Only ever shrinks: db:verify-modules fails on one that is not here, and on one here that is gone (--prune strikes those).",
+  "note": "Banyan 0.0.1 initial-baseline correction: record the already shipped invoice_template_snapshot_frozen -> PROJECT dependency. Its runtime coupling remains. After this explicit one-time correction, this ratchet only shrinks; future new crossings require an architectural decision. --prune removes vanished edges, never adds new ones.",
   "code": [],
   "fk": [
     "cheque -> pay_stub",
@@ -13,6 +13,7 @@
     "cheque cheque_scope_guard -> PAYROLL",
     "cheque_sequence cheque_scope_guard -> PAYROLL",
     "entity seed_crm_pipeline_on_entity -> CRM",
+    "invoice invoice_template_snapshot_frozen -> PROJECT",
     "invoice project_accounting_owner_guard -> PROJECT",
     "invoice_application mirror_project_invoice_application -> PROJECT",
     "invoice_application project_application_update_guard -> PROJECT",

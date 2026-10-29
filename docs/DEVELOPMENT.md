@@ -21,7 +21,7 @@ npm run db:suites
 
 The battery runs database suites, classifier checks, type generation and a production build. It records actual results in `docs/evidence/suites.md` and preserves failures. Individual commands and fault-injection tools are listed in `package.json`; inspect prerequisites before running them. Browser and PDF checks may require Playwright Chromium and Poppler (`pdftotext`, `pdftoppm`). GitHub Actions installs these tools as configured in its workflow.
 
-The inherited MV4 module-boundary failure remains visible; see [Known limitations](KNOWN-LIMITATIONS.md). The release does not claim an all-green battery. Historical `docs/evidence/mutations.md` is a sanitized reference input for coverage reporting, not proof of a Banyan 0.0.1 test run.
+The original package's MV4 initial-baseline mismatch and N12 source omission are described in [CI repair](CI_REPAIR.md). Preserve the no-growth ratchet after the documented one-time initial-baseline correction. Historical `docs/evidence/mutations.md` is a sanitized reference input for coverage reporting, not proof of a Banyan 0.0.1 test run.
 
 ## Synthetic demo
 

@@ -1,4 +1,6 @@
-# Release checks — Banyan 0.0.1
+# Original release checks — Banyan 0.0.1
+
+This is the historical preparation record. Its full battery ran on the richer staging tree; it did not detect the seven source files omitted by Git ignore rules. The later public CI exposed MV4 and N12. See [CI repair](CI_REPAIR.md) for the correction and archive-based qualification procedure.
 
 Qualification date: 2026-10-28. Source base: FigTree `ed0e3a351ac7a8ff6f020487f6cf6f3dfe2a6596`. All application/test data was synthetic, in fresh owned loopback PostgreSQL resources. Production was not accessed.
 
