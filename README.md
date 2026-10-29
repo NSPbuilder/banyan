@@ -6,7 +6,7 @@
 
 Banyan is a self-hosted finance and business management application for small businesses, with a focus on British Columbia, Canada. It starts with accounting logic: business activity, financial effects, and supporting evidence belong together.
 
-**Version 0.0.1 · Self-hosted preview · Source available under [Elastic License 2.0](LICENSE).** ELv2 is not an OSI-approved open-source license. Published by **NSP Labs AI Inc.**
+**Version 0.0.1 · Self-hosted preview · Open source under [GNU AGPL v3](LICENSE) (`AGPL-3.0-only`).** Published by **NSP Labs AI Inc.**
 
 ![Banyan Income workspace with fictional invoices, payments, credit notes and outstanding balances.](docs/media/screenshots/income.png)
 
@@ -100,6 +100,8 @@ Read the full [installation guide](docs/INSTALL.md), [backup guide](docs/BACKUP.
 
 ## License
 
-First-party code is available under **Elastic License 2.0**, subject to its restrictions. Separate authorization is required for commercial hosting under the publisher's licensing policy; no commercial hosting agreement is included in this package. Consult the actual license text for the grant and restrictions. Third-party dependencies and notices retain their respective licenses.
+Banyan's first-party code is licensed under the **GNU Affero General Public License, version 3 only** (`AGPL-3.0-only`). Commercial use, modification, distribution and hosting are permitted subject to the license. If you modify Banyan and let users interact with that version remotely over a computer network, you must offer those users access to the Corresponding Source of that version at no charge, as required by section 13. See [LICENSE](LICENSE) for the full terms.
+
+Third-party dependencies, vendored code and fonts retain their respective licenses and notices; see [Third-party notices](THIRD-PARTY-NOTICES.md).
 
 Banyan 0.0.1 is derived from FigTree. Some internal identifiers deliberately retain the FigTree name for backup, audit, credential and database compatibility. See [Provenance](docs/PROVENANCE.md).

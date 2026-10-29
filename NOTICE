@@ -2,10 +2,13 @@ Banyan 0.0.1
 Copyright 2026 NSP Labs AI Inc.
 
 Derived from FigTree commit ed0e3a351ac7a8ff6f020487f6cf6f3dfe2a6596.
-First-party source is provided under Elastic License 2.0; see LICENSE.
-This source-available license is not an OSI-approved open-source license.
+First-party source is licensed under the GNU Affero General Public License,
+version 3 only (SPDX: AGPL-3.0-only); see LICENSE.
+
+Banyan is distributed without any warranty, including the implied warranties
+of merchantability or fitness for a particular purpose. See LICENSE for details.
 
 Third-party dependencies, vendored code and fonts retain their respective
 licenses and notices. See THIRD-PARTY-NOTICES.md and vendor/braces/LICENSE.
 The publisher-supplied Banyan icon is included as project branding.
-No separate commercial hosting agreement or contribution assignment is included.
+No separate contribution copyright assignment is included.

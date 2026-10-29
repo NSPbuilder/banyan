@@ -9,6 +9,6 @@ First Banyan source preview, derived from FigTree 0.0.14 (`ed0e3a35`).
 - Project revenue line descriptions and printable Payment in stages notes.
 - Receipt PDFs with payment evidence; shared Project/Income attachments, edit/removal controls and combined-PDF print path.
 - English public README, installation, backup, integration, development and manual-publication material.
-- Elastic License 2.0 and third-party notices; cleaned public source snapshot with no private environment or production data.
+- First-party code relicensed from Elastic License 2.0 to GNU AGPL v3 only (`AGPL-3.0-only`); third-party licenses and notices retained. The source snapshot excludes private environments and production data.
 
 Known inherited MV4 module-boundary failure is disclosed in `docs/KNOWN-LIMITATIONS.md`.

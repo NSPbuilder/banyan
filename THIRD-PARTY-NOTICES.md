@@ -1,6 +1,6 @@
 # Third-party notices
 
-Banyan's first-party ELv2 license does not replace dependency licenses.
+Banyan's first-party AGPL-3.0-only license does not replace dependency licenses.
 
 ## Locked dependencies
 

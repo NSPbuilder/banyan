@@ -3,7 +3,7 @@
   "name": "Banyan",
   "version": "0.0.1",
   "upstreamCommit": "ed0e3a351ac7a8ff6f020487f6cf6f3dfe2a6596",
-  "note": "Banyan 0.0.1 CI repair from published commit 471833eed9d3c157bee648038bd599cf49a3cd81. Every source file except SOURCE_MANIFEST.json is hashed; runtime environments, stores, history and installed dependencies are excluded.",
+  "note": "Banyan 0.0.1 first-party AGPL-3.0-only relicensing snapshot based on 671ab10b9c7647bed23f8c10c8862a6d12d1b6f9. Every source file except SOURCE_MANIFEST.json is hashed; runtime environments, stores, history and installed dependencies are excluded. Third-party files retain their original licenses.",
   "files": [
     {
       "path": ".env.example",
@@ -43,26 +43,26 @@
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 793,
-      "sha256": "b35aa14c61086e0e808a08ba93929362bbf0eaea5f5ca25061bfaf812de93f66",
+      "bytes": 875,
+      "sha256": "d721927087d72299714eb2760b235eaa7ac422ab8a190c707189b2a6ceda280a",
       "mode": "0o644"
     },
     {
       "path": "CONTRIBUTING.md",
-      "bytes": 980,
-      "sha256": "fc421326e1c3e54265d94a583abfb3bbcfcdd883d45042c02a70cec5a2e3e478",
+      "bytes": 1149,
+      "sha256": "5fa26492e0e6f223b2503f84dbb67e99ed80972d7a7caef5e21096efe731ada1",
       "mode": "0o644"
     },
     {
       "path": "LICENSE",
-      "bytes": 3860,
-      "sha256": "48255018b41fc0e965b1115af7e6779bc218bb8a6747d561da800d5022622aa2",
+      "bytes": 34523,
+      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
       "mode": "0o644"
     },
     {
       "path": "NOTICE",
-      "bytes": 561,
-      "sha256": "458edf4ecf7faf4d959408f0c74f8654bf0639313c5fe6afb4acc40f31ff01ae",
+      "bytes": 680,
+      "sha256": "6d3ff1cf36a2fb540e211ca29fe2707fc5513db54e609296b7d8dabfb8cabfef",
       "mode": "0o644"
     },
     {
@@ -3391,8 +3391,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 7139,
-      "sha256": "26be2974f161e67906bf8dc745c00629ef84ffb4c91ae78ac409212f4ed269b4",
+      "bytes": 7331,
+      "sha256": "349e92ea08102dfe7394873443c5836772fedae223a55553bed51f0549cd2dd8",
       "mode": "0o644"
     },
     {
@@ -3403,8 +3403,8 @@
     },
     {
       "path": "THIRD-PARTY-NOTICES.md",
-      "bytes": 2276,
-      "sha256": "4462ee5670f6a0df9b5146a21008a4747ab4ef5c028ec188df7d19fd661d38d7",
+      "bytes": 2285,
+      "sha256": "f16578244d6fba27d4598cb44d9cc933118f96b0e8891b3b09a45ee24a30d5a4",
       "mode": "0o644"
     },
     {
@@ -4429,8 +4429,8 @@
     },
     {
       "path": "docs/PROVENANCE.md",
-      "bytes": 1871,
-      "sha256": "02e31a2d6576a76992f704086f038adbb8f47a8f09f9f3b85a1fe8d82cd420e0",
+      "bytes": 1976,
+      "sha256": "580b1cbbbc5e021d598e68e29f3d41f6870d5eb2a59de3fdc1b3e7502043fbfd",
       "mode": "0o644"
     },
     {
@@ -4531,14 +4531,14 @@
     },
     {
       "path": "package-lock.json",
-      "bytes": 350902,
-      "sha256": "7ae0b39d9cec80d950de871a2d64c96aa56615566a9e9ee642a59a6b36814fce",
+      "bytes": 350904,
+      "sha256": "274142817347d47e53b7761690deb854fba01aba090f398e5e8e0e0e55faca50",
       "mode": "0o644"
     },
     {
       "path": "package.json",
-      "bytes": 13631,
-      "sha256": "d9d366b60d1340887d296088742a08d659617f7c38191b5966e7b3bdcbe7dfd5",
+      "bytes": 13633,
+      "sha256": "d2c8a98ca2a64b46947d4896bc1aa7f208e2313b54d5e4fc8ae5fc4d44fcfe1b",
       "mode": "0o644"
     },
     {
